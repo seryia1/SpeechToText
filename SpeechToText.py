@@ -1,15 +1,13 @@
 import streamlit as st
 import speech_recognition as sr
 
-
-def transcribe_speech():
+def transcribe_audio_file(audio_file):
     # Initialize recognizer class
     r = sr.Recognizer()
-    # Reading Microphone as source
-    with sr.Microphone() as source:
-        st.info("Speak now...")
-        # listen for speech and store in audio_text variable
-        audio_text = r.listen(source)
+    # Use the uploaded audio file as source
+    with sr.AudioFile(audio_file) as source:
+        st.info("Processing audio...")
+        audio_text = r.record(source)
         st.info("Transcribing...")
 
         try:
@@ -17,17 +15,17 @@ def transcribe_speech():
             text = r.recognize_google(audio_text)
             return text
         except:
-            return "Sorry, I did not get that."
-
-
+            return "Sorry, I could not transcribe the audio."
 
 def main():
     st.title("Speech Recognition App")
-    st.write("Click on the microphone to start speaking:")
+    st.write("Upload an audio file (wav, mp3, flac) to transcribe:")
 
-    # add a button to trigger speech recognition
-    if st.button("Start Recording"):
-        text = transcribe_speech()
-        st.write("Transcription: ", text)
+    uploaded_file = st.file_uploader("Choose an audio file", type=["wav", "mp3", "flac"])
+    if uploaded_file is not None:
+        text = transcribe_audio_file(uploaded_file)
+        st.write("Transcription:")
+        st.success(text)
+
 if __name__ == "__main__":
     main()
